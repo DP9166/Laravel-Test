@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Question;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -21,7 +22,7 @@ class PostAnswersTest extends TestCase
             'user_id'   =>  $user->id,
             'content'   =>  'This is an answer.'
         ]);
-
+        /** @test **/
         $reponse->assertStatus(201);
 
         $answer = $question->answers()->where('user_id', $user->id)->first();
@@ -29,4 +30,30 @@ class PostAnswersTest extends TestCase
 
         $this->assertEquals(1, $question->answers()->count());
     }
+
+    /** @test **/
+    public function user_can_view_a_published_question()
+    {
+        $question = factory(Question::class)->create([
+            'published_at'  =>  Carbon::parse('-1 week')
+        ]);
+
+        $this->get('/questions/'. $question->id)
+            ->assertStatus(200)
+            ->assertSee($question->title)
+            ->assertSee($question->content);
+    }
+
+    /** @test **/
+    public function user_cannot_view_a_unpublished_question()
+    {
+        $question = factory(Question::class)->create([
+            'published_at'  =>  null
+        ]);
+
+        $this->withExceptionHandling()
+            ->get('/questions/'. $question->id)
+            ->assertStatus(404);
+    }
+
 }
