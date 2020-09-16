@@ -71,4 +71,21 @@ class PostAnswersTest extends TestCase
             ->assertStatus(404);
     }
 
+    /** @test **/
+    public function content_is_required_to_post_answers()
+    {
+        $this->withExceptionHandling();
+
+        $question = factory(Question::class)->state('published')->create();
+        $user = factory(User::class)->create();
+
+        $response = $this->post("/questions/{$question->id}/answers", [
+            'user_id'   =>  $user->id,
+            'content'   =>  null
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('content');
+    }
+
 }
