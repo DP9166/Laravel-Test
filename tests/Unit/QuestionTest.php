@@ -18,7 +18,7 @@ class QuestionTest extends TestCase
     {
         $question = factory(Question::class)->create();
 
-        factory(Answer::class)->create(['question_id' => $question->id]);
+        create(Answer::class, ['question_id' => $question->id]);
 
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Relations\HasMany', $question->answers());
     }
