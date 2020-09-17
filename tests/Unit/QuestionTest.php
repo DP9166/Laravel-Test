@@ -37,4 +37,16 @@ class QuestionTest extends TestCase
         $this->assertFalse($publishedQuestions->contains($unpublishedQuestion));
 
     }
+
+    /** @test **/
+    public function can_mark_an_answer_as_best()
+    {
+        $question = create(Question::class);
+
+        $answer = create(Answer::class, ['question_id' =>  $question->id]);
+
+        $question->markAsBestAnswer($answer);
+
+        $this->assertEquals($question->best_answer_id, $answer->id);
+    }
 }
